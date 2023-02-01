@@ -12,12 +12,14 @@
     </string-array>
 
     <string-array name="color_name">
+        <item>Gray</item>
         <item>Blue</item>
         <item>Red</item>
         <item>Black</item>
     </string-array>
     <string-array name="color_value">
-        <item>#FF041861</item>
+        <item>#FF606268</item>
+        <item>#FF0A4481</item>
         <item>#FFE30D0D</item>
         <item>#FF000000</item>
     </string-array>
