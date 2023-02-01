@@ -8,5 +8,7 @@
     <string name="update_time_summary">Location update time.</string>
     <string name="update_color">Track color</string>
     <string name="update_color_of_track_summary">Choose track color</string>
+    <string name="location_dialog_message">Do you want enable GPS?</string>
+    <string name="location_disable">Location disable</string>
 
 </resources>

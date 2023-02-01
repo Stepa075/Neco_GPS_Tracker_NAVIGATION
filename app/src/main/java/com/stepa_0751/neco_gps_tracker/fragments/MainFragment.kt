@@ -3,6 +3,7 @@ package com.stepa_0751.neco_gps_tracker.fragments
 
 import android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
 import android.Manifest.permission.ACCESS_FINE_LOCATION
+import android.app.Dialog
 import android.content.Context
 import android.location.LocationManager
 import android.os.Build
@@ -16,6 +17,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.stepa_0751.neco_gps_tracker.databinding.FragmentMainBinding
+import com.stepa_0751.neco_gps_tracker.utils.DialogManager
 import com.stepa_0751.neco_gps_tracker.utils.checkPermission
 import com.stepa_0751.neco_gps_tracker.utils.showToast
 import org.osmdroid.config.Configuration
@@ -114,7 +116,8 @@ class MainFragment : Fragment() {
         val lManager = activity?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         val isEnabled = lManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
         if (!isEnabled){
-            showToast("GPS disable")
+            // вызов диалог менеджера для запуска вручную пользователем GPS
+            DialogManager.showLocEnableDialog(activity as AppCompatActivity)
         }else{
             showToast("GPS enable")
         }
