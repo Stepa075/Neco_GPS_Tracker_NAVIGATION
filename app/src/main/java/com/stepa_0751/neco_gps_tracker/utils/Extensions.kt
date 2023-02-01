@@ -1,8 +1,10 @@
 package com.stepa_0751.neco_gps_tracker.utils
 
+import android.content.pm.PackageManager
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.stepa_0751.neco_gps_tracker.R
 
@@ -37,4 +39,11 @@ fun Fragment.showToast(s: String){          //  функция вызова то
 
 fun AppCompatActivity.showToast(s: String){      //  функция вызова тостов в активити
     Toast.makeText(this, s, Toast.LENGTH_SHORT).show()
+}
+
+fun Fragment.checkPermission(p: String): Boolean{          //  функция проверки наличия разрешений
+    return when(PackageManager.PERMISSION_GRANTED){
+        ContextCompat.checkSelfPermission(activity as AppCompatActivity, p) -> true
+        else -> false
+    }
 }
