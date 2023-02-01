@@ -4,6 +4,7 @@ package com.stepa_0751.neco_gps_tracker.fragments
 import android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
 import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.content.Context
+import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -72,7 +73,8 @@ class MainFragment : Fragment() {
             ActivityResultContracts
             .RequestMultiplePermissions()){
             if(it[ACCESS_FINE_LOCATION] == true){                // здесь не добавлено Manifest.permission.
-                initOSM()                                        //  будет ли работать????
+                initOSM()                                          //  будет ли работать????
+                checkLocationEnabled()
 
             }else{
                 showToast("Не дано разрешение на использование местоположения!!!")
@@ -92,6 +94,7 @@ class MainFragment : Fragment() {
     private fun checkPermissionAfter10() {
         if (checkPermission(ACCESS_FINE_LOCATION) && checkPermission(ACCESS_BACKGROUND_LOCATION)) {
             initOSM()
+            checkLocationEnabled()
         } else {
             pLauncher.launch(arrayOf(ACCESS_FINE_LOCATION, ACCESS_BACKGROUND_LOCATION))
         }
@@ -101,9 +104,21 @@ class MainFragment : Fragment() {
     private fun checkPermissionBefore10() {
         if (checkPermission(ACCESS_FINE_LOCATION)) {
             initOSM()
+            checkLocationEnabled()
         } else {
             pLauncher.launch(arrayOf(ACCESS_FINE_LOCATION))
         }
+    }
+
+    private fun checkLocationEnabled(){
+        val lManager = activity?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val isEnabled = lManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+        if (!isEnabled){
+            showToast("GPS disable")
+        }else{
+            showToast("GPS enable")
+        }
+
     }
 
     companion object {
