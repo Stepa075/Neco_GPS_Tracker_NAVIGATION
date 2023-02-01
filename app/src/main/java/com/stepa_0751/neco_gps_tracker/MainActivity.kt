@@ -2,8 +2,11 @@ package com.stepa_0751.neco_gps_tracker
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Toast
 import com.stepa_0751.neco_gps_tracker.databinding.ActivityMainBinding
+import com.stepa_0751.neco_gps_tracker.fragments.MainFragment
+import com.stepa_0751.neco_gps_tracker.fragments.SetFragment
+import com.stepa_0751.neco_gps_tracker.fragments.TracksFragment
+import com.stepa_0751.neco_gps_tracker.utils.openFragment
 
 class MainActivity : AppCompatActivity() {
 
@@ -11,16 +14,17 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        binding = ActivityMainBinding.inflate(layoutInflater) //Привязка всех элементов в хмл
+        setContentView(binding.root)                         // чтобы мы могли к ним обращаться
         onButtomNavClicks()
-    }
+        openFragment(MainFragment.newInstance()) // собственно вызов функции переключения из Extantions.kt
+    }                                              //при запуске приложения
     private fun onButtomNavClicks(){
-        binding.bNav.setOnItemSelectedListener {
-            when(it.itemId){
-                R.id.id_home -> Toast.makeText(this, "Home", Toast.LENGTH_SHORT).show()
-                R.id.id_tracks ->Toast.makeText(this, "Tracks", Toast.LENGTH_SHORT).show()
-                R.id.id_settings ->Toast.makeText(this, "Settings", Toast.LENGTH_SHORT).show()
+        binding.bNav.setOnItemSelectedListener {  //  слушатель кнопок меню
+            when(it.itemId){    // переключение фрагментов
+                R.id.id_home -> openFragment(MainFragment.newInstance())
+                R.id.id_tracks ->openFragment(TracksFragment.newInstance())
+                R.id.id_settings ->openFragment(SetFragment())
             }
             true
         }
