@@ -64,6 +64,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:background="#99ECE4E4"
+        android:paddingStart="5dp"
+        android:paddingEnd="5dp"
         android:text="Averege velosity 3.5 km/h"
         android:textColor="#000000"
         app:layout_constraintStart_toStartOf="@+id/tvTime"

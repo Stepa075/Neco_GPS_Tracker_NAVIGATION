@@ -9,7 +9,6 @@ import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,19 +17,29 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.MutableLiveData
+import com.stepa_0751.neco_gps_tracker.R
 import com.stepa_0751.neco_gps_tracker.databinding.FragmentMainBinding
+import com.stepa_0751.neco_gps_tracker.location.LocationService
 import com.stepa_0751.neco_gps_tracker.utils.DialogManager
+import com.stepa_0751.neco_gps_tracker.utils.TimeUtils
 import com.stepa_0751.neco_gps_tracker.utils.checkPermission
 import com.stepa_0751.neco_gps_tracker.utils.showToast
 import org.osmdroid.config.Configuration
 import org.osmdroid.library.BuildConfig
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
+import java.util.*
 
 
 class MainFragment : Fragment() {
     private lateinit var pLauncher: ActivityResultLauncher<Array<String>>
     private lateinit var binding: FragmentMainBinding
+    private var isServiceRunning = false
+    private var timer: Timer? = null
+    private var startTime = 0L
+    //  через muttableLiveData безопасно обновлять єлементы  view - ничего не сломается
+    private val timeData = MutableLiveData<String>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -38,7 +47,7 @@ class MainFragment : Fragment() {
     ): View {
         // !!!Нужно настроить библиотеку OSMAndroid до инициализации фрагмента(разметки)!!!
         settingsOsm()
-        Log.d("MyLog", "onCreateView")
+
         //  Собственно именно здесь загружается разметка, в Inflate!!!
         binding = FragmentMainBinding.inflate(inflater, container, false)
         return binding.root
@@ -46,9 +55,86 @@ class MainFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         registerPermissions()
+        setOnClicks()
+        checkServiceState()
+        updateTime()
 
+
+        //Запуск сервиса  геолокации вместе с приложением !
+//        if(Build.VERSION.SDK_INT>= Build.VERSION_CODES.O){
+//            activity?.startForegroundService((Intent(activity, LocationService::class.java)))
+//        }else{
+//            activity?.startService(Intent(activity, LocationService::class.java))
+//        }
+
+    }
+
+    private fun setOnClicks() = with(binding){
+        val listener = onClicks()
+        fStartStop.setOnClickListener(listener)
+
+    }
+
+    // Нужно присваивать всем кнопкам не этот слушатель(т.к. тогда создаются новые инстансы
+    // этой функции, а нужно создавать переменную в которую записывать эту функцию и
+    // передавать всем тем, кому нужен слушатель!
+
+    private fun onClicks(): View.OnClickListener{
+        return View.OnClickListener {
+            when(it.id){
+                R.id.fStartStop -> startStopService()
+            }
+        }
+    }
+
+    private fun updateTime(){
+        timeData.observe(viewLifecycleOwner){
+            binding.tvTime.text = it
+        }
+    }
+
+    private fun startTimer(){
+        timer?.cancel()
+        timer = Timer()
+        startTime = LocationService.startTime
+        timer?.schedule(object : TimerTask(){override fun run() {
+            activity?.runOnUiThread{timeData.value = getCurrentTime()}
+        } }, 1000, 1000)
+    }
+
+    private fun getCurrentTime(): String{
+        return "Time: ${TimeUtils.getTime(System.currentTimeMillis() - startTime)}"
+    }
+
+        private fun startStopService(){
+        if(!isServiceRunning){
+            startLocService()
+        }else{
+            activity?.stopService(Intent(activity, LocationService::class.java))
+            binding.fStartStop.setImageResource(R.drawable.ic_play)
+            timer?.cancel()
+        }
+        isServiceRunning = !isServiceRunning
+    }
+
+    private fun checkServiceState(){
+        isServiceRunning = LocationService.isRunning
+        if(isServiceRunning){
+            binding.fStartStop.setImageResource(R.drawable.ic_stop)
+            startTimer()
+        }
+    }
+
+    private fun  startLocService(){
+        if(Build.VERSION.SDK_INT>= Build.VERSION_CODES.O){
+            activity?.startForegroundService((Intent(activity, LocationService::class.java)))
+        }else{
+            activity?.startService(Intent(activity, LocationService::class.java))
+        }
+        binding.fStartStop.setImageResource(R.drawable.ic_stop)
+        LocationService.startTime = System.currentTimeMillis()
+        startTimer()
     }
 
     override fun onResume(){
