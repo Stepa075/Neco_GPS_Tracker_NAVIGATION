@@ -3,11 +3,13 @@ package com.stepa_0751.neco_gps_tracker.fragments
 
 import android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
 import android.Manifest.permission.ACCESS_FINE_LOCATION
-import android.app.Dialog
 import android.content.Context
+import android.content.Intent
 import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -36,6 +38,7 @@ class MainFragment : Fragment() {
     ): View {
         // !!!Нужно настроить библиотеку OSMAndroid до инициализации фрагмента(разметки)!!!
         settingsOsm()
+        Log.d("MyLog", "onCreateView")
         //  Собственно именно здесь загружается разметка, в Inflate!!!
         binding = FragmentMainBinding.inflate(inflater, container, false)
         return binding.root
@@ -43,10 +46,20 @@ class MainFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         registerPermissions()
+
+    }
+
+    override fun onResume(){
+        super.onResume()
         checkLockPermission()
     }
 
+    override fun onPause(){
+        super.onPause()
+
+    }
 
     // конфиг для осм библиотеки
     private fun settingsOsm(){
@@ -117,9 +130,17 @@ class MainFragment : Fragment() {
         val isEnabled = lManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
         if (!isEnabled){
             // вызов диалог менеджера для запуска вручную пользователем GPS
-            DialogManager.showLocEnableDialog(activity as AppCompatActivity)
+            DialogManager.showLocEnableDialog(activity as AppCompatActivity,
+            //Интерфейс слушателя
+                object : DialogManager.Listener{
+                    override fun onClick() {
+                        startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+                    }
+
+                }
+            )
         }else{
-            showToast("GPS enable")
+            showToast("GPS enabled")
         }
 
     }
