@@ -54,6 +54,7 @@ class LocationService : Service() {
     }
 
     private val locCallback = object : LocationCallback() {
+
         override fun onLocationResult(lResult: LocationResult) {
             super.onLocationResult(lResult)
             val currentLocation = lResult.lastLocation

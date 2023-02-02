@@ -3,12 +3,15 @@ package com.stepa_0751.neco_gps_tracker.fragments
 
 import android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
 import android.Manifest.permission.ACCESS_FINE_LOCATION
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,8 +21,10 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.stepa_0751.neco_gps_tracker.R
 import com.stepa_0751.neco_gps_tracker.databinding.FragmentMainBinding
+import com.stepa_0751.neco_gps_tracker.location.LocationModel
 import com.stepa_0751.neco_gps_tracker.location.LocationService
 import com.stepa_0751.neco_gps_tracker.utils.DialogManager
 import com.stepa_0751.neco_gps_tracker.utils.TimeUtils
@@ -59,6 +64,7 @@ class MainFragment : Fragment() {
         setOnClicks()
         checkServiceState()
         updateTime()
+        registerLocReceiver()
 
 
         //Запуск сервиса  геолокации вместе с приложением !
@@ -229,6 +235,22 @@ class MainFragment : Fragment() {
             showToast("GPS enabled")
         }
 
+    }
+    // Прием интента
+    private val receiver = object : BroadcastReceiver(){
+        override fun onReceive(context: Context?, i: Intent?) {
+            if(i?.action == LocationService.LOC_MODEL_INTENT){
+                val locModel = i.getSerializableExtra(LocationService.LOC_MODEL_INTENT) as LocationModel
+                Log.d("MyLog", "main: ${locModel.distance}")
+            }
+        }
+
+    }
+
+    private fun registerLocReceiver(){
+        val locFilter = IntentFilter(LocationService.LOC_MODEL_INTENT)
+        LocalBroadcastManager.getInstance(activity as AppCompatActivity)
+            .registerReceiver(receiver, locFilter)
     }
 
     companion object {
