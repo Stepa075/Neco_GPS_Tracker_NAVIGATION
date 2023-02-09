@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.Color
 import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
@@ -34,15 +35,19 @@ import com.stepa_0751.neco_gps_tracker.utils.checkPermission
 import com.stepa_0751.neco_gps_tracker.utils.showToast
 import org.osmdroid.config.Configuration
 import org.osmdroid.library.BuildConfig
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.overlay.Polyline
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import java.util.*
 
 
 class MainFragment : Fragment() {
+    private var pl: Polyline? = null
     private lateinit var pLauncher: ActivityResultLauncher<Array<String>>
     private lateinit var binding: FragmentMainBinding
     private var isServiceRunning = false
+    private var firstStart = true
     private var timer: Timer? = null
     private var startTime = 0L
     private val model: MainViewModel by activityViewModels()
@@ -104,6 +109,7 @@ class MainFragment : Fragment() {
         tvDistanse.text = distance                                         // метров в секунду в километры в час
         tvVelosity.text = velosity
         tvAverege.text = aVelosity
+        updatePolyline(it.geoPointsList)
         }
     }
 
@@ -180,6 +186,8 @@ class MainFragment : Fragment() {
     }
 
     private fun initOSM() = with(binding){
+        pl = Polyline()
+        pl?.outlinePaint?.color = Color.BLUE
         map.controller.setZoom(16.0)
         //создание оверлеев наложений на карту и подключение к map
         val mLocProvider = GpsMyLocationProvider(activity)
@@ -189,6 +197,7 @@ class MainFragment : Fragment() {
         myLocOverlay.runOnFirstFix {
             map.overlays.clear()
             map.overlays.add(myLocOverlay)
+            map.overlays.add(pl)
         }
     }
 
@@ -274,6 +283,25 @@ class MainFragment : Fragment() {
         super.onDetach()
         LocalBroadcastManager.getInstance(activity as AppCompatActivity)
             .unregisterReceiver(receiver)
+    }
+          // добасвление одной точки на полилайн
+    private fun addaPoint(list: List<GeoPoint>){
+        pl?.addPoint(list[list.size - 1])
+
+    }
+    // добасвление всего списка при переходе из сервиса в фрагмент
+    private fun fillPolyline(list: List<GeoPoint>){
+        list.forEach{pl?.addPoint(it)
+        }
+    }
+    //    сама функция выбора одной из двух верхних функций добавления точки
+    private fun updatePolyline(list: List<GeoPoint>){
+        if(list.size > 1 && firstStart){
+            fillPolyline(list)
+            firstStart = false
+        }else{
+            addaPoint(list)
+        }
     }
 
     companion object {
