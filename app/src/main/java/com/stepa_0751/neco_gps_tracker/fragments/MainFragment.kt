@@ -20,8 +20,10 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.stepa_0751.neco_gps_tracker.MainViewModel
 import com.stepa_0751.neco_gps_tracker.R
 import com.stepa_0751.neco_gps_tracker.databinding.FragmentMainBinding
 import com.stepa_0751.neco_gps_tracker.location.LocationModel
@@ -43,8 +45,7 @@ class MainFragment : Fragment() {
     private var isServiceRunning = false
     private var timer: Timer? = null
     private var startTime = 0L
-    //  через muttableLiveData безопасно обновлять єлементы  view - ничего не сломается
-    private val timeData = MutableLiveData<String>()
+    private val model: MainViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -65,6 +66,7 @@ class MainFragment : Fragment() {
         checkServiceState()
         updateTime()
         registerLocReceiver()
+        locationUpdates()
 
 
         //Запуск сервиса  геолокации вместе с приложением !
@@ -94,8 +96,19 @@ class MainFragment : Fragment() {
         }
     }
 
+    private fun locationUpdates() = with(binding){
+        model.locationUpdates.observe(viewLifecycleOwner){
+        val distance = "Distance: ${String.format("%.1f", it.distance)} m"    // Установка количества знаков после запятой
+        val velosity = "Velosity: ${String.format("%.1f", 3.6f * it.velosity)} km/h" // перевод из
+        val aVelosity = "Average velosity: ${getAverageSpeed(it.distance)} km/h"
+        tvDistanse.text = distance                                         // метров в секунду в километры в час
+        tvVelosity.text = velosity
+        tvAverege.text = aVelosity
+        }
+    }
+
     private fun updateTime(){
-        timeData.observe(viewLifecycleOwner){
+        model.timeData.observe(viewLifecycleOwner){
             binding.tvTime.text = it
         }
     }
@@ -105,8 +118,12 @@ class MainFragment : Fragment() {
         timer = Timer()
         startTime = LocationService.startTime
         timer?.schedule(object : TimerTask(){override fun run() {
-            activity?.runOnUiThread{timeData.value = getCurrentTime()}
+            activity?.runOnUiThread{model.timeData.value = getCurrentTime()}
         } }, 1000, 1000)
+    }
+
+    private fun getAverageSpeed(distance: Float): String{
+        return String.format("%.1f", 3.6f * (distance / ((System.currentTimeMillis() - startTime) / 1000.0f)))
     }
 
     private fun getCurrentTime(): String{
@@ -241,7 +258,7 @@ class MainFragment : Fragment() {
         override fun onReceive(context: Context?, i: Intent?) {
             if(i?.action == LocationService.LOC_MODEL_INTENT){
                 val locModel = i.getSerializableExtra(LocationService.LOC_MODEL_INTENT) as LocationModel
-                Log.d("MyLog", "main: ${locModel.distance}")
+                model.locationUpdates.value = locModel
             }
         }
 
@@ -251,6 +268,12 @@ class MainFragment : Fragment() {
         val locFilter = IntentFilter(LocationService.LOC_MODEL_INTENT)
         LocalBroadcastManager.getInstance(activity as AppCompatActivity)
             .registerReceiver(receiver, locFilter)
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        LocalBroadcastManager.getInstance(activity as AppCompatActivity)
+            .unregisterReceiver(receiver)
     }
 
     companion object {
