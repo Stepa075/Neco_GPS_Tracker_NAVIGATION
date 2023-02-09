@@ -21,7 +21,7 @@
             android:paddingTop="2dp"
             android:paddingEnd="2dp"
             android:paddingBottom="2dp"
-            android:text="Save this track"
+            android:text="Save this track?"
             android:textColor="#070707"
             android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -62,11 +62,12 @@
             app:layout_constraintTop_toBottomOf="@+id/tvSpeed" />
 
         <LinearLayout
-            android:layout_width="409dp"
+            android:id="@+id/horLayout"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="5dp"
             android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
+            android:layout_marginEnd="5dp"
             android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

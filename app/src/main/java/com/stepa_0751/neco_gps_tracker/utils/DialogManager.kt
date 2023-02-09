@@ -2,7 +2,11 @@ package com.stepa_0751.neco_gps_tracker.utils
 
 import android.app.AlertDialog
 import android.content.Context
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.view.LayoutInflater
 import com.stepa_0751.neco_gps_tracker.R
+import com.stepa_0751.neco_gps_tracker.databinding.SaveDialogBinding
 
 object DialogManager {
     fun showLocEnableDialog(context: Context, listener: Listener) {
@@ -15,6 +19,24 @@ object DialogManager {
         dialog.setButton(AlertDialog.BUTTON_NEGATIVE, "No") { _, _ ->
             dialog.dismiss()
         }
+        dialog.show()
+    }
+
+    fun showSaveDialog(context: Context, listener: Listener){
+        val builder = AlertDialog.Builder(context)
+        val binding = SaveDialogBinding.inflate(LayoutInflater.from(context), null, false)
+        builder.setView(binding.root)
+        val dialog = builder.create()
+        binding.apply{
+            bSave.setOnClickListener{
+                listener.onClick()
+                dialog.dismiss()
+            }
+            bCancel.setOnClickListener{
+                dialog.dismiss()
+            }
+        }
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialog.show()
     }
 
