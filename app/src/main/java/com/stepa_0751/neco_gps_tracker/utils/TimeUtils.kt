@@ -7,9 +7,11 @@ import java.util.TimeZone
 @SuppressLint("SimpleDateFormat")
 object TimeUtils {
 
-    // функция для перевода времени в адекватный вид и отсчета таймера
+    // Образцы форматирования времени и даты
     private val timeFormatter = SimpleDateFormat("HH:mm:ss")
     private val dateFormatter = SimpleDateFormat("dd/MM/yyyy HH:mm")
+
+    // функция для перевода времени в адекватный вид и отсчета таймера
     fun getTime(timeInMillis: Long): String{
         val cv = Calendar.getInstance()
         timeFormatter.timeZone = TimeZone.getTimeZone(("UTC"))
