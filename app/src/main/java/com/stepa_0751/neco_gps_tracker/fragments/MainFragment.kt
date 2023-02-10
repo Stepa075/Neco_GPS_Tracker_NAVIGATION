@@ -27,6 +27,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.stepa_0751.neco_gps_tracker.MainViewModel
 import com.stepa_0751.neco_gps_tracker.R
 import com.stepa_0751.neco_gps_tracker.databinding.FragmentMainBinding
+import com.stepa_0751.neco_gps_tracker.db.TrackItem
 import com.stepa_0751.neco_gps_tracker.location.LocationModel
 import com.stepa_0751.neco_gps_tracker.location.LocationService
 import com.stepa_0751.neco_gps_tracker.utils.DialogManager
@@ -39,10 +40,12 @@ import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.overlay.Polyline
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
+import java.sql.Time
 import java.util.*
 
 
 class MainFragment : Fragment() {
+    private var trackItem: TrackItem? = null
     private var pl: Polyline? = null
     private lateinit var pLauncher: ActivityResultLauncher<Array<String>>
     private lateinit var binding: FragmentMainBinding
@@ -109,6 +112,14 @@ class MainFragment : Fragment() {
         tvDistanse.text = distance                                         // метров в секунду в километры в час
         tvVelosity.text = velosity
         tvAverege.text = aVelosity
+        trackItem = TrackItem(
+            null,
+            getCurrentTime(),
+            TimeUtils.getDate(),
+            String.format("%.1f", it.distance / 1000),
+            getAverageSpeed(it.distance),
+            ""
+        )
         updatePolyline(it.geoPointsList)
         }
     }
@@ -143,7 +154,9 @@ class MainFragment : Fragment() {
             activity?.stopService(Intent(activity, LocationService::class.java))
             binding.fStartStop.setImageResource(R.drawable.ic_play)
             timer?.cancel()
-            DialogManager.showSaveDialog(requireContext(), object : DialogManager.Listener{
+            DialogManager.showSaveDialog(requireContext(),
+                trackItem,
+                object : DialogManager.Listener{
                 override fun onClick() {
                     showToast("Track saved!")
                 }

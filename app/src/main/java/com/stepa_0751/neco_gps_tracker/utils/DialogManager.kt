@@ -7,6 +7,7 @@ import android.graphics.drawable.ColorDrawable
 import android.view.LayoutInflater
 import com.stepa_0751.neco_gps_tracker.R
 import com.stepa_0751.neco_gps_tracker.databinding.SaveDialogBinding
+import com.stepa_0751.neco_gps_tracker.db.TrackItem
 
 object DialogManager {
     fun showLocEnableDialog(context: Context, listener: Listener) {
@@ -22,12 +23,19 @@ object DialogManager {
         dialog.show()
     }
 
-    fun showSaveDialog(context: Context, listener: Listener){
+    fun showSaveDialog(context: Context, item: TrackItem?, listener: Listener){
         val builder = AlertDialog.Builder(context)
         val binding = SaveDialogBinding.inflate(LayoutInflater.from(context), null, false)
         builder.setView(binding.root)
         val dialog = builder.create()
         binding.apply{
+
+            val time = "${item?.time}"
+            val velocity = "Average speed: ${item?.velosity} km/h"
+            val distance = "Distance: ${item?.distanse} km"
+            tvTime.text = time
+            tvSpeed.text = velocity
+            tvDistanse.text = distance
             bSave.setOnClickListener{
                 listener.onClick()
                 dialog.dismiss()
