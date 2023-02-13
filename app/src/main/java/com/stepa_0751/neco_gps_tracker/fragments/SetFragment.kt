@@ -10,15 +10,17 @@ import com.stepa_0751.neco_gps_tracker.R
 class SetFragment : PreferenceFragmentCompat() {
     private lateinit var timePref: Preference
     private lateinit var colorPref: Preference
-
+    private lateinit var serverIp: Preference
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.main_preferense, rootKey)
         init()
     }
     private fun init(){
+        serverIp = findPreference("server_ip") !!
         timePref = findPreference("update_time_key")!!  //слушатель изменения
         colorPref = findPreference("color_key")!!  //слушатель изменения
         val changeListener = onChangeListener()             // его инициализатор
+        serverIp.onPreferenceChangeListener = changeListener
         timePref.onPreferenceChangeListener = changeListener
         colorPref.onPreferenceChangeListener = changeListener
         initPrefs()
@@ -30,12 +32,19 @@ class SetFragment : PreferenceFragmentCompat() {
             // выбор следующего действия по ключу из префа
             when(pref.key){
                     "update_time_key" -> onTimeChange(value.toString())
+                    "server_ip" -> onTextChange(value.toString())
                         // "функция" изменения цвета на титле при выборе цвета трека
                     "color_key" -> pref.icon?.setTint(Color.parseColor(value.toString()))
                 }
             true
         }
     }
+
+    private fun onTextChange(value: String){
+        serverIp.title = "Server IP: ${value}"
+    }
+
+
         //функция изменения текста в титле выбора скорости обновления
     private fun onTimeChange(value: String){
        // showToast("Value changed: $value")        //   выбора в списке настройки (3, 5, 10 секунд)
@@ -60,5 +69,9 @@ class SetFragment : PreferenceFragmentCompat() {
 
         val trackColor = pref?.getString("color_key", "#FF041861")
          colorPref.icon?.setTint(Color.parseColor(trackColor))
+
+         val setTitleServer = pref?.getString("server_ip", "Server IP")
+         serverIp.title = "Server IP: $setTitleServer"
+
     }
 }

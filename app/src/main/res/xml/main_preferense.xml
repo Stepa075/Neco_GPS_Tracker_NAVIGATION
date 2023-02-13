@@ -22,4 +22,13 @@
             app:icon="@drawable/ic_circle"
             app:summary="@string/update_color_of_track_summary" />
     </PreferenceCategory>
+    <PreferenceCategory android:title="Web Settings">
+
+        <EditTextPreference
+            android:defaultValue="127.0.0.1:5000"
+            android:key="server_ip"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="Server IP" />
+    </PreferenceCategory>
 </PreferenceScreen>
