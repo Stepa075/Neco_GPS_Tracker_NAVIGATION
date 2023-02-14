@@ -11,15 +11,18 @@ class SetFragment : PreferenceFragmentCompat() {
     private lateinit var timePref: Preference
     private lateinit var colorPref: Preference
     private lateinit var serverIp: Preference
+    private lateinit var timeToSend: Preference
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.main_preferense, rootKey)
         init()
     }
     private fun init(){
+        timeToSend = findPreference("time_to_send_data_on_server") !!
         serverIp = findPreference("server_ip") !!
         timePref = findPreference("update_time_key")!!  //слушатель изменения
         colorPref = findPreference("color_key")!!  //слушатель изменения
         val changeListener = onChangeListener()             // его инициализатор
+        timeToSend.onPreferenceChangeListener = changeListener
         serverIp.onPreferenceChangeListener = changeListener
         timePref.onPreferenceChangeListener = changeListener
         colorPref.onPreferenceChangeListener = changeListener
@@ -32,7 +35,8 @@ class SetFragment : PreferenceFragmentCompat() {
             // выбор следующего действия по ключу из префа
             when(pref.key){
                     "update_time_key" -> onTimeChange(value.toString())
-                    "server_ip" -> onTextChange(value.toString())
+                    "server_ip" -> onTextChangeServer(value.toString())
+                    "time_to_send_data_on_server" -> onTextChangeTimeToSent(value.toString())
                         // "функция" изменения цвета на титле при выборе цвета трека
                     "color_key" -> pref.icon?.setTint(Color.parseColor(value.toString()))
                 }
@@ -40,8 +44,11 @@ class SetFragment : PreferenceFragmentCompat() {
         }
     }
 
-    private fun onTextChange(value: String){
+    private fun onTextChangeServer(value: String){
         serverIp.title = "Server IP: ${value}"
+    }
+    private fun onTextChangeTimeToSent(value: String){
+        timeToSend.title = "Interval time sending data: ${value} sec"
     }
 
 
@@ -72,6 +79,9 @@ class SetFragment : PreferenceFragmentCompat() {
 
          val setTitleServer = pref?.getString("server_ip", "Server IP")
          serverIp.title = "Server IP: $setTitleServer"
+
+         val setTitleTimeToSent = pref?.getString("time_to_send_data_on_server", "60")
+         timeToSend.title = "Interval time sending data: $setTitleTimeToSent sec."
 
     }
 }
