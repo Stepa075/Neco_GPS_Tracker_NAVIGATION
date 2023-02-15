@@ -27,7 +27,7 @@
         <EditTextPreference
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:defaultValue="127.0.0.1:5000"
+            android:defaultValue="192.168.1.100:5000"
             android:key="server_ip"
             android:selectAllOnFocus="true"
             android:singleLine="true"

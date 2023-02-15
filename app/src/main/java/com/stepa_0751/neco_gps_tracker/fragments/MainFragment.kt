@@ -24,6 +24,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.stepa_0751.neco_gps_tracker.MainApp
 import com.stepa_0751.neco_gps_tracker.MainViewModel
 import com.stepa_0751.neco_gps_tracker.R
 import com.stepa_0751.neco_gps_tracker.databinding.FragmentMainBinding
@@ -53,7 +54,9 @@ class MainFragment : Fragment() {
     private var firstStart = true
     private var timer: Timer? = null
     private var startTime = 0L
-    private val model: MainViewModel by activityViewModels()
+    private val model: MainViewModel by activityViewModels{
+        MainViewModel.ViewModelFactory((requireContext().applicationContext as MainApp).database)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -75,6 +78,9 @@ class MainFragment : Fragment() {
         updateTime()
         registerLocReceiver()
         locationUpdates()
+        model.tracks.observe(viewLifecycleOwner){
+            Log.d("MyLog", "List size: ${it.size}")
+        }
 
 
         //Запуск сервиса  геолокации вместе с приложением !
@@ -155,11 +161,13 @@ class MainFragment : Fragment() {
             activity?.stopService(Intent(activity, LocationService::class.java))
             binding.fStartStop.setImageResource(R.drawable.ic_play)
             timer?.cancel()
+            val track = getTrackItem()
             DialogManager.showSaveDialog(requireContext(),
-                getTrackItem(),
+                track,
                 object : DialogManager.Listener{
                 override fun onClick() {
                     showToast("Track saved!")
+                    model.insertTrack(track)
                 }
             })
         }
