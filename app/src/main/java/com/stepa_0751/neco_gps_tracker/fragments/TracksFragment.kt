@@ -1,6 +1,7 @@
 package com.stepa_0751.neco_gps_tracker.fragments
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -14,9 +15,10 @@ import com.stepa_0751.neco_gps_tracker.databinding.FragmentMainBinding
 import com.stepa_0751.neco_gps_tracker.databinding.TracksBinding
 import com.stepa_0751.neco_gps_tracker.databinding.ViewTrackBinding
 import com.stepa_0751.neco_gps_tracker.db.TrackAdapter
+import com.stepa_0751.neco_gps_tracker.db.TrackItem
 
 
-class TracksFragment : Fragment() {
+class TracksFragment : Fragment(), TrackAdapter.Listener{
     private lateinit var binding: TracksBinding
     private lateinit var adapter: TrackAdapter
     private val model: MainViewModel by activityViewModels{
@@ -46,7 +48,7 @@ class TracksFragment : Fragment() {
         }
     }
     private fun initRcView() = with(binding){
-        adapter = TrackAdapter()
+        adapter = TrackAdapter(this@TracksFragment)
         rcView.layoutManager = LinearLayoutManager(requireContext())
         rcView.adapter = adapter
     }
@@ -57,4 +59,8 @@ class TracksFragment : Fragment() {
         @JvmStatic
         fun newInstance() = TracksFragment()
         }
+
+    override fun onClick(track: TrackItem) {
+        model.deleteTrack(track)
     }
+}

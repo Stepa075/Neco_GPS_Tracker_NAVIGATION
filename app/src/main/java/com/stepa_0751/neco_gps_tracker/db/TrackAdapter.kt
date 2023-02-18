@@ -9,16 +9,25 @@ import androidx.recyclerview.widget.RecyclerView
 import com.stepa_0751.neco_gps_tracker.R
 import com.stepa_0751.neco_gps_tracker.databinding.TrackItemBinding
 
-class TrackAdapter : ListAdapter<TrackItem, TrackAdapter.Holder>(Comparator()) {
-    class Holder(view: View) : RecyclerView.ViewHolder(view){
+class TrackAdapter(private val listener: Listener) : ListAdapter<TrackItem, TrackAdapter.Holder>(Comparator()) {
+    class Holder(view: View, private val listener: Listener) : RecyclerView.ViewHolder(view),View.OnClickListener {
         private val binding = TrackItemBinding.bind(view)
+        private var trackTemp: TrackItem? = null
+        init {
+            binding.ibDelete.setOnClickListener(this)
+        }
         fun bind(track: TrackItem) = with(binding){
+            trackTemp = track
             val speed = "${track.velosity} km/h"
             val distance = "${track.distanse} km"
             tvDate.text = track.date
             tvSpeedee.text = speed
             tvTimee.text = track.time
             tvDistance.text = distance
+        }
+
+        override fun onClick(p0: View?) {
+            trackTemp?.let { listener.onClick(it) }
         }
 
     }
@@ -36,10 +45,14 @@ class TrackAdapter : ListAdapter<TrackItem, TrackAdapter.Holder>(Comparator()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.track_item, parent, false)
-        return Holder(view)
+        return Holder(view, listener)
     }
 
     override fun onBindViewHolder(holder: Holder, position: Int) {
         holder.bind(getItem(position))
+    }
+
+    interface Listener{
+        fun onClick(track: TrackItem)
     }
 }
