@@ -78,9 +78,7 @@ class MainFragment : Fragment() {
         updateTime()
         registerLocReceiver()
         locationUpdates()
-        model.tracks.observe(viewLifecycleOwner){
-            Log.d("MyLog", "List size: ${it.size}")
-        }
+
 
 
         //Запуск сервиса  геолокации вместе с приложением !
