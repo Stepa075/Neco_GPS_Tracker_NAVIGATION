@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 class MainViewModel(db: MainDb): ViewModel() {
     val dao = db.getDao()
     val locationUpdates = MutableLiveData<LocationModel>()
+    val currentTrack = MutableLiveData<TrackItem>()
     //  через muttableLiveData безопасно обновлять єлементы  view - ничего не сломается
     val timeData = MutableLiveData<String>()
 

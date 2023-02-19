@@ -25,6 +25,7 @@ class TrackAdapter(private val listener: Listener) : ListAdapter<TrackItem, Trac
             tvSpeedee.text = speed
             tvTimee.text = track.time
             tvDistance.text = distance
+
         }
 
         override fun onClick(view: View?) {                  // Выбор по айди типа объекта, на который нажали и действия
