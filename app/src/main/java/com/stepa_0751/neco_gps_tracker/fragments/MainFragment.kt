@@ -212,6 +212,7 @@ class MainFragment : Fragment() {
     override fun onResume(){
         super.onResume()
         checkLockPermission()
+        firstStart = true
     }
 
     override fun onPause(){
@@ -242,8 +243,9 @@ class MainFragment : Fragment() {
         myLocOverlay.enableFollowLocation()
         myLocOverlay.runOnFirstFix {
             map.overlays.clear()
-            map.overlays.add(myLocOverlay)
             map.overlays.add(pl)
+            map.overlays.add(myLocOverlay)
+
         }
     }
 
@@ -332,7 +334,7 @@ class MainFragment : Fragment() {
     }
           // добасвление одной точки на полилайн
     private fun addaPoint(list: List<GeoPoint>){
-        pl?.addPoint(list[list.size - 1])
+        if(list.isNotEmpty()) pl?.addPoint(list[list.size - 1])
 
     }
     // добасвление всего списка при переходе из сервиса в фрагмент
