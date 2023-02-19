@@ -1,6 +1,7 @@
 package com.stepa_0751.neco_gps_tracker.fragments
 
 import android.content.Context
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.preference.PreferenceManager
 import com.stepa_0751.neco_gps_tracker.MainApp
 import com.stepa_0751.neco_gps_tracker.MainViewModel
 import com.stepa_0751.neco_gps_tracker.R
@@ -75,6 +77,10 @@ class ViewTrackFragment : Fragment() {
 
     private fun getPolyline(geoPoints: String): Polyline{      //Получаем из строки со значениями жпс
         val polyline = Polyline()
+        polyline.outlinePaint.color = Color.parseColor(
+            PreferenceManager.getDefaultSharedPreferences(requireContext())
+                .getString("color_key", "#FF0A4481")
+        )
         val list = geoPoints.split("/")         //сначала массив точек (широта и долгота) с обрезанным /
         list.forEach{
             if (it.isEmpty()) return@forEach // здесь убираем пустой последний элемент из массива

@@ -12,7 +12,6 @@ import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,8 +21,8 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.MutableLiveData
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.preference.PreferenceManager
 import com.stepa_0751.neco_gps_tracker.MainApp
 import com.stepa_0751.neco_gps_tracker.MainViewModel
 import com.stepa_0751.neco_gps_tracker.R
@@ -41,7 +40,6 @@ import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.overlay.Polyline
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
-import java.sql.Time
 import java.util.*
 
 
@@ -224,7 +222,10 @@ class MainFragment : Fragment() {
 
     private fun initOSM() = with(binding){
         pl = Polyline()
-        pl?.outlinePaint?.color = Color.BLUE
+        pl?.outlinePaint?.color = Color.parseColor(
+        PreferenceManager.getDefaultSharedPreferences(requireContext())
+            .getString("color_key", "#FF0A4481")
+        )
         map.controller.setZoom(16.0)
         //создание оверлеев наложений на карту и подключение к map
         val mLocProvider = GpsMyLocationProvider(activity)
