@@ -2,20 +2,19 @@ package com.stepa_0751.neco_gps_tracker.fragments
 
 import android.content.Context
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.stepa_0751.neco_gps_tracker.MainApp
 import com.stepa_0751.neco_gps_tracker.MainViewModel
-import com.stepa_0751.neco_gps_tracker.R
-import com.stepa_0751.neco_gps_tracker.databinding.FragmentMainBinding
-import com.stepa_0751.neco_gps_tracker.databinding.TracksBinding
 import com.stepa_0751.neco_gps_tracker.databinding.ViewTrackBinding
 import org.osmdroid.config.Configuration
 import org.osmdroid.library.BuildConfig
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.overlay.Polyline
 
 
 class ViewTrackFragment : Fragment() {
@@ -46,7 +45,26 @@ class ViewTrackFragment : Fragment() {
             tvTime.text = it.time
             tvAverege.text = speed
             tvDistanse.text = distance
+            val polyline = getPolyline(it.geoPoints)
+            map.overlays.add(polyline)
+            goToStartPosition(polyline.actualPoints[0])  //Берем из полилайн первую позицию для goToStartPosition
         }
+    }
+
+    private fun goToStartPosition(startPosition: GeoPoint){
+        binding.map.controller.zoomTo(16.0)
+        binding.map.controller.animateTo(startPosition)
+    }
+
+    private fun getPolyline(geoPoints: String): Polyline{      //Получаем из строки со значениями жпс
+        val polyline = Polyline()
+        val list = geoPoints.split("/")         //сначала массив точек (широта и долгота) с обрезанным /
+        list.forEach{
+            if (it.isEmpty()) return@forEach // здесь убираем пустой последний элемент из массива
+            val points = it.split(",")                // потом в цикле из каждого элемента массива извлекаем
+            polyline.addPoint(GeoPoint(points[0].toDouble(), points[1].toDouble()))  //широту и долготу и переводим их
+        }                                                                             // в double
+        return polyline
     }
 
     private fun settingsOsm(){
