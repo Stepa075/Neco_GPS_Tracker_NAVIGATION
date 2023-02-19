@@ -14,7 +14,8 @@ class TrackAdapter(private val listener: Listener) : ListAdapter<TrackItem, Trac
         private val binding = TrackItemBinding.bind(view)
         private var trackTemp: TrackItem? = null
         init {
-            binding.ibDelete.setOnClickListener(this)
+            binding.ibDelete.setOnClickListener(this) // Привязка слушателя к кнопке удалить
+            binding.item.setOnClickListener(this)      // Привязка слушателя к всему CardView
         }
         fun bind(track: TrackItem) = with(binding){
             trackTemp = track
@@ -26,8 +27,17 @@ class TrackAdapter(private val listener: Listener) : ListAdapter<TrackItem, Trac
             tvDistance.text = distance
         }
 
-        override fun onClick(p0: View?) {
-            trackTemp?.let { listener.onClick(it) }
+        override fun onClick(view: View?) {                  // Выбор по айди типа объекта, на который нажали и действия
+            if (view != null) {                                         //Лишняя проверка на не null???
+            val type = when(view.id){
+                    R.id.ibDelete ->  ClickType.DELETE
+                    R.id.item ->  ClickType.OPEN
+                    else -> ClickType.OPEN
+                }
+                trackTemp?.let{listener.onClick(it, type)}
+            }
+
+
         }
 
     }
@@ -53,6 +63,10 @@ class TrackAdapter(private val listener: Listener) : ListAdapter<TrackItem, Trac
     }
 
     interface Listener{
-        fun onClick(track: TrackItem)
+        fun onClick(track: TrackItem, type: ClickType)
+    }
+    enum class ClickType{       // Класс, через который передается?? или из которого берутся константы??
+        DELETE,
+        OPEN
     }
 }

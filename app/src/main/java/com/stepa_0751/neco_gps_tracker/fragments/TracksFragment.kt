@@ -16,6 +16,7 @@ import com.stepa_0751.neco_gps_tracker.databinding.TracksBinding
 import com.stepa_0751.neco_gps_tracker.databinding.ViewTrackBinding
 import com.stepa_0751.neco_gps_tracker.db.TrackAdapter
 import com.stepa_0751.neco_gps_tracker.db.TrackItem
+import com.stepa_0751.neco_gps_tracker.utils.openFragment
 
 
 class TracksFragment : Fragment(), TrackAdapter.Listener{
@@ -59,8 +60,14 @@ class TracksFragment : Fragment(), TrackAdapter.Listener{
         @JvmStatic
         fun newInstance() = TracksFragment()
         }
+                //Выбор действия в зависимости от того, на что нажал пользователь, на удалить или просто на маршрут
+    override fun onClick(track: TrackItem, type: TrackAdapter.ClickType) {
+        when(type){
+            TrackAdapter.ClickType.DELETE -> model.deleteTrack(track)
+            TrackAdapter.ClickType.OPEN -> openFragment(ViewTrackFragment.newInstance())
 
-    override fun onClick(track: TrackItem) {
-        model.deleteTrack(track)
+        }
+
+
     }
 }
