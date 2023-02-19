@@ -52,6 +52,7 @@ class MainFragment : Fragment() {
     private var firstStart = true
     private var timer: Timer? = null
     private var startTime = 0L
+    private lateinit var myLocOverlay: MyLocationNewOverlay
     private val model: MainViewModel by activityViewModels{
         MainViewModel.ViewModelFactory((requireContext().applicationContext as MainApp).database)
     }
@@ -91,6 +92,7 @@ class MainFragment : Fragment() {
     private fun setOnClicks() = with(binding){
         val listener = onClicks()
         fStartStop.setOnClickListener(listener)
+        fCenter.setOnClickListener(listener)
 
     }
 
@@ -102,8 +104,14 @@ class MainFragment : Fragment() {
         return View.OnClickListener {
             when(it.id){
                 R.id.fStartStop -> startStopService()
+                R.id.fCenter -> centerLocation()
             }
         }
+    }
+
+    private fun centerLocation(){
+        binding.map.controller.animateTo(myLocOverlay.myLocation)
+        myLocOverlay.enableFollowLocation()
     }
 
     private fun locationUpdates() = with(binding){
@@ -229,7 +237,7 @@ class MainFragment : Fragment() {
         map.controller.setZoom(16.0)
         //создание оверлеев наложений на карту и подключение к map
         val mLocProvider = GpsMyLocationProvider(activity)
-        val myLocOverlay = MyLocationNewOverlay(mLocProvider, map)
+        myLocOverlay = MyLocationNewOverlay(mLocProvider, map)
         myLocOverlay.enableMyLocation()
         myLocOverlay.enableFollowLocation()
         myLocOverlay.runOnFirstFix {
