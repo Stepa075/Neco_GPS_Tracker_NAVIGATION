@@ -108,8 +108,8 @@ class LocationService : Service() {
                 //val list = getWeatherByDays(response)
                 //dayList.value = list
                 //currentDay.value = list[0]
-                Log.d("MyLog", "Request: $response.value")
-
+                Log.d("MyLog", "Request: $response.value") // Здесь нужно распарсить ответ сервера,
+                    // хотя нахуй не надо, т к мы будем слать сами данные на сервер.
 
             },
             { Log.d("MyLog", "Error request: $it") }
