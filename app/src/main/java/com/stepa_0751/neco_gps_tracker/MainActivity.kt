@@ -17,7 +17,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater) //Привязка всех элементов в хмл
         setContentView(binding.root)                         // чтобы мы могли к ним обращаться
         onButtomNavClicks()
-        openFragment(MainFragment.newInstance()) // собственно вызов функции переключения из Extantions.kt
+        openFragment(MainFragment.newInstance()) // собственно вызов функции переключения из Extentions.kt
     }                                              //при запуске приложения
     private fun onButtomNavClicks(){
         binding.bNav.setOnItemSelectedListener {  //  слушатель кнопок меню

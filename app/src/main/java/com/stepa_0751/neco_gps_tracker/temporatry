@@ -1,0 +1,24 @@
+private fun getData(
+    city: String, context: Context,
+    dayList: MutableState<List<WeatherModel>>,
+    currentDay: MutableState<WeatherModel>) {
+    val api = "38b27a1546ab4bb5a9364709232202"
+    val url = "https://api.weatherapi.com/v1/forecast.json?key=$api&q=$city&days=3&aqi=no&alerts=no"
+    val queue = Volley.newRequestQueue(context)
+    val sRequest = StringRequest(
+        Request.Method.GET,
+        url, { response ->
+            //val list = getWeatherByDays(response)
+            //dayList.value = list
+            //currentDay.value = list[0]
+            Log.d("MyLog", "Request: $currentDay.value"
+
+
+        },
+        { Log.d("MyLog", "Error request: $it") }
+
+    )
+    queue.add(sRequest)
+}
+
+implementation"com.android.volley:volley:1.2.1"

@@ -6,6 +6,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
@@ -17,6 +18,9 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.preference.PreferenceManager
+import com.android.volley.Request
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
 import com.google.android.gms.location.*
 import com.google.android.gms.location.Priority.PRIORITY_HIGH_ACCURACY
 import com.stepa_0751.neco_gps_tracker.MainActivity
@@ -81,8 +85,46 @@ class LocationService : Service() {
             lastLocation = currentLocation
 
             Log.d("MyLog", "Distance: $distance")
+
+
+            getData("Kharkiv", context = this@LocationService)
+
         }
     }
+
+
+
+    private fun getData(
+        city: String, context: Context
+    )
+        //dayList: MutableState<List<WeatherModel>>,
+        //currentDay: MutableState<WeatherModel>)
+        {val api: String = "38b27a1546ab4bb5a9364709232202"
+        val url: String = "https://api.weatherapi.com/v1/forecast.json?key=$api&q=$city&days=3&aqi=no&alerts=no"
+        val queue = Volley.newRequestQueue(context)
+        val sRequest = StringRequest(
+            Request.Method.GET,
+            url, { response ->
+                //val list = getWeatherByDays(response)
+                //dayList.value = list
+                //currentDay.value = list[0]
+                Log.d("MyLog", "Request: $response.value")
+
+
+            },
+            { Log.d("MyLog", "Error request: $it") }
+
+        )
+        queue.add(sRequest)
+
+    }
+
+
+
+
+
+
+
         // Отправка интента в фрагмент View
     private fun sendLocData(locModel: LocationModel){
         //  Для отправки через интент КЛАССА, он должен быть
@@ -120,7 +162,8 @@ class LocationService : Service() {
         ).setSmallIcon(R.mipmap.ic_launcher)
             .setContentTitle("Tracker Running!")
             .setContentIntent(pIntent).build()
-        // Перед запуском ОЬЯЗАТЕЛЬНО в пермиссионах выставить FOREGROUND_SERVICE!!!
+
+             // Перед запуском ОЬЯЗАТЕЛЬНО в пермиссионах выставить FOREGROUND_SERVICE!!!
         startForeground(99, notification)
     }
     //  Настройка клиента провайдера геолокации
